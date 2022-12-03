@@ -4,6 +4,8 @@ import random
 import time
 import os
 import setup as st
+from abc import ABC, abstractmethod
+from threading import Timer 
 
 #Hitbox
 #Bullet
@@ -24,9 +26,9 @@ class Hitbox(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         
         #Image loading
-        self.__hitbox = pygame.image.load(os.path.join(img_folder, "hitbox.png"))\
+        self.__hitbox = pygame.image.load(os.path.join(st.img_folder, "hitbox.png"))\
             .convert_alpha()
-        self.__temp = pygame.image.load(os.path.join(img_folder, "temp.png")).convert_alpha()
+        self.__temp = pygame.image.load(os.path.join(st.img_folder, "temp.png")).convert_alpha()
         
         #Instance value setting.
         self.image = self.__hitbox
@@ -78,7 +80,7 @@ class Bullet(pygame.sprite.Sprite):
         
         #Adiciona uma imagem
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(os.path.join(so.img_folder,"bullet.png")).convert()
+        self.image = pygame.image.load(os.path.join(st.img_folder,"bullet.png")).convert()
         self.image = pygame.transform.scale(self.image, (35, 35))
         self.image.set_colorkey((0,0,0))
         
@@ -115,7 +117,7 @@ class Bullet(pygame.sprite.Sprite):
         #Caso a bala ultrapasse as bordas, a elimine.
         if self.rect.bottom < 0:
             self.kill()
-        elif self.rect.bottom > so.HEIGHT:
+        elif self.rect.bottom > st.HEIGHT:
             self.kill()
 
 
@@ -125,7 +127,7 @@ class Player(pygame.sprite.Sprite):
 
         #Adiciona uma imagem
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(os.path.join(so.img_folder,"ship.png")).convert()
+        self.image = pygame.image.load(os.path.join(st.img_folder,"ship.png")).convert()
         self.image = pygame.transform.scale(self.image, (64, 64))
         self.image.set_colorkey((0,0,0))
 
@@ -137,8 +139,8 @@ class Player(pygame.sprite.Sprite):
         self.radius = 32
         
         #Orienta a posição inicial do jogador
-        self.rect.centerx = so.WIDTH/2
-        self.rect.bottom = so.HEIGHT -10
+        self.rect.centerx = st.WIDTH/2
+        self.rect.bottom = st.HEIGHT -10
         
         # Define a velocidade do jogador
         self.x_speed = 0
@@ -258,14 +260,14 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += self.y_speed
         
         #Não deixa que o jogador ultrapasse os limites da tela
-        if self.rect.right > so.WIDTH:
-            self.rect.right = so.WIDTH
+        if self.rect.right > st.WIDTH:
+            self.rect.right = st.WIDTH
         if self.rect.left < 0:
             self.rect.left = 0
         if self.rect.top < 0:
             self.rect.top = 0
-        if self.rect.bottom > so.HEIGHT:
-            self.rect.bottom = so.HEIGHT
+        if self.rect.bottom > st.HEIGHT:
+            self.rect.bottom = st.HEIGHT
     
     #Define a função de atirar
     def shoot(self):
@@ -276,18 +278,18 @@ class Player(pygame.sprite.Sprite):
             
             if self.power == 1:
                 #Reproduz som de tiro
-                shoot_sound = pygame.mixer.Sound(os.path.join(so.sound_folder,"Laser_Shoot4.wav"))
+                shoot_sound = pygame.mixer.Sound(os.path.join(st.sound_folder,"Laser_Shoot4.wav"))
                 shoot_sound.set_volume(0.5)
                 shoot_sound.play()
                 
                 #Dispara a balas
                 bullet = Bullet(self.rect.centerx,self.rect.top)
                 bullet.set_speed(0,-15)
-                so.all_sprites.add(bullet)
-                so.bullets.add(bullet)
+                st.all_sprites.add(bullet)
+                st.bullets.add(bullet)
             if self.power >= 2:
                 #Reproduz som de tiro
-                shoot_sound = pygame.mixer.Sound(os.path.join(so.sound_folder,"Laser_Shoot4.wav"))
+                shoot_sound = pygame.mixer.Sound(os.path.join(st.sound_folder,"Laser_Shoot4.wav"))
                 shoot_sound.set_volume(0.5)
                 shoot_sound.play()
                 
@@ -296,15 +298,47 @@ class Player(pygame.sprite.Sprite):
                 bullet2 = Bullet(self.rect.right,self.rect.centery)
                 bullet1.set_speed(0,-15)
                 bullet2.set_speed(0,-15)
-                so.all_sprites.add(bullet1)
-                so.bullets.add(bullet1)
-                so.all_sprites.add(bullet2)
-                so.bullets.add(bullet2)
+                st.all_sprites.add(bullet1)
+                st.bullets.add(bullet1)
+                st.all_sprites.add(bullet2)
+                st.bullets.add(bullet2)
         
     def gain_powerup(self):
         self.power += 1
         self.power_time = pygame.time.get_ticks()
 
+
+class Enemy(pygame.sprite.Sprite, ABC):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+
+    @abstractmethod
+    def get_position(self):
+        pass
+
+    @abstractmethod
+    def speed(self):
+        pass
+
+    @abstractmethod
+    def get_position(self):
+        pass
+
+    @abstractmethod
+    def get_is_alive(self):
+        pass
+
+    @abstractmethod
+    def get_score(self):
+        pass
+
+    @abstractmethod
+    def set_is_alive(self):
+        pass
+
+    @abstractmethod
+    def update(self):
+        pass
 
 class Asteroid(Enemy, pygame.sprite.Sprite):
     #Características iniciais da classe quando ela é iniciada
@@ -320,21 +354,21 @@ class Asteroid(Enemy, pygame.sprite.Sprite):
         for asteroid in asteroids_list:
             if asteroid == "asteroid.png":
                 sprite = pygame.image.load(
-                    os.path.join(so.img_folder,asteroid)
+                    os.path.join(st.img_folder,asteroid)
                     ).convert()
                 sprite = pygame.transform.scale(sprite, (120, 120))
 
                 asteroids_images.append(sprite)
             elif asteroid == "asteroid2.png":
                 sprite = pygame.image.load(
-                    os.path.join(so.img_folder,asteroid)
+                    os.path.join(st.img_folder,asteroid)
                     ).convert()
                 sprite = pygame.transform.scale(sprite, (60, 60))
 
                 asteroids_images.append(sprite)
             else:
                 sprite = pygame.image.load(
-                    os.path.join(so.img_folder,asteroid)
+                    os.path.join(st.img_folder,asteroid)
                     ).convert()
                 sprite = pygame.transform.scale(sprite, (30, 30))
 
@@ -353,7 +387,7 @@ class Asteroid(Enemy, pygame.sprite.Sprite):
         self.radius = int(self.rect.width * 0.90 / 2)
         
         #Orienta a posição inicial do asteroide
-        self.rect.x = random.randrange(so.WIDTH - self.rect.width)
+        self.rect.x = random.randrange(st.WIDTH - self.rect.width)
         self.rect.y = random.randrange(-40,-15)
         
         #Define uma velocidade aleatória para cada asteroide
@@ -406,10 +440,10 @@ class Asteroid(Enemy, pygame.sprite.Sprite):
         self.rect.y += self.y_speed 
         
         #Caso o asteroide ultrapasse as bordas, crie outro
-        if self.rect.top > so.HEIGHT + 10 or self.rect.left < -10 or self.rect.right > so.WIDTH + 10:
+        if self.rect.top > st.HEIGHT + 10 or self.rect.left < -10 or self.rect.right > st.WIDTH + 10:
             self.x_speed = random.randrange(-5,5)
             self.y_speed = random.randrange(1,10)
-            self.rect.x = random.randrange(so.WIDTH - self.rect.width)
+            self.rect.x = random.randrange(st.WIDTH - self.rect.width)
             self.rect.y = random.randrange(-100,-40)
             self.y_speed = random.randrange(1,10)
 
@@ -427,7 +461,7 @@ class Explosion(pygame.sprite.Sprite):
 
         for i in range (6):
             filename = f"explosion{i}.png"
-            image = pygame.image.load(os.path.join(img_folder, filename)).convert()
+            image = pygame.image.load(os.path.join(st.img_folder, filename)).convert()
             image.set_colorkey((0,0,0))
             
             large_image = pygame.transform.scale(image,(80,80))
@@ -500,7 +534,7 @@ class Explosion(pygame.sprite.Sprite):
     #Método para criar som de explosão  
     def explosion_sound(self):
         explosion_sound = pygame.mixer.Sound(
-            os.path.join(sound_folder, "Explosion7.wav"))
+            os.path.join(st.sound_folder, "Explosion7.wav"))
         explosion_sound.play()
 
 
@@ -510,7 +544,7 @@ class Enemy_ship(Enemy, pygame.sprite.Sprite):
         
         #Adiciona uma imagem à nave inimiga
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(os.path.join(so.img_folder,"enemy_ship.png")).convert()
+        self.image = pygame.image.load(os.path.join(st.img_folder,"enemy_ship.png")).convert()
         self.image = pygame.transform.scale(self.image, (64, 64))
         self.image.set_colorkey((255,255,255))
         
@@ -520,8 +554,8 @@ class Enemy_ship(Enemy, pygame.sprite.Sprite):
         self.radius = 28
         
         #Orienta a posição inicial da nave inimiga
-        self.rect.x = random.randrange(so.WIDTH - self.rect.width)
-        self.rect.y = random.randrange(int(so.HEIGHT/8),(int(so.HEIGHT/8))+30)
+        self.rect.x = random.randrange(st.WIDTH - self.rect.width)
+        self.rect.y = random.randrange(int(st.HEIGHT/8),(int(st.HEIGHT/8))+30)
         
         #Define a velocidade da nave inimiga
         self.x_speed = 0
@@ -592,12 +626,12 @@ class Enemy_ship(Enemy, pygame.sprite.Sprite):
         
     #Permite que a nave inimiga atire
     def shoot(self,speed_x,speed_y):
-        shoot_sound = pygame.mixer.Sound(os.path.join(so.sound_folder,"Laser_Shoot4.wav"))
+        shoot_sound = pygame.mixer.Sound(os.path.join(st.sound_folder,"Laser_Shoot4.wav"))
         shoot_sound.set_volume(0.5)
         bullet = Bullet(self.rect.centerx,self.rect.top)
         bullet.set_speed(speed_x, speed_y) 
-        so.all_sprites.add(bullet)
-        so.enemies_bullets.add(bullet)
+        st.all_sprites.add(bullet)
+        st.enemies_bullets.add(bullet)
         shoot_sound.play()
         
     def enemy_shoots(self):
@@ -620,8 +654,8 @@ class Power(pygame.sprite.Sprite):
         powers_images = {}
         
         #Adicione 2 tipos de bônus às opções
-        powers_images["shield"] = pygame.image.load(os.path.join(so.img_folder,"shield.png")).convert()
-        powers_images["gun"] = pygame.image.load(os.path.join(so.img_folder,"star.png")).convert()
+        powers_images["shield"] = pygame.image.load(os.path.join(st.img_folder,"shield.png")).convert()
+        powers_images["gun"] = pygame.image.load(os.path.join(st.img_folder,"star.png")).convert()
         
         
         self.type = random.choice(["shield","gun"])
@@ -639,8 +673,8 @@ class Power(pygame.sprite.Sprite):
         
         
         #Orienta a posição inicial do bônus
-        self.rect.x = random.randrange(so.WIDTH - self.rect.width)
-        self.rect.y = random.randrange(so.HEIGHT - self.rect.height)
+        self.rect.x = random.randrange(st.WIDTH - self.rect.width)
+        self.rect.y = random.randrange(st.HEIGHT - self.rect.height)
 
         # Desaparece após 3 segundos na tela
         Timer(3, self.disappear).start()
