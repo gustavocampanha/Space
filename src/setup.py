@@ -19,3 +19,15 @@ HEIGHT = display_info.current_h
 
 # Frames por segundo
 FPS = 30
+
+# Define cores 
+RED = (255, 0, 0)
+GREEN = (20, 255, 140)
+BLUE = (100, 100, 255)
+GREY = (210, 210 ,210)
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+MAGENTA = (194,9,84)
+
+#Define a fonte utilizada no jogo
+font = pygame.font.SysFont("arcade", 20)
