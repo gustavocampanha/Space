@@ -1,6 +1,6 @@
 #Importando bibliotecas necessárias
 import pygame
-import setup as st``
+import setup as st
 
 #Button
 #InputTextBox
