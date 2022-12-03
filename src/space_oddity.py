@@ -55,17 +55,17 @@ class Game():
         exit_button = it.Button(text="EXIT", x=x_centered, y=y_centered+30, width=200, height=25)
         back_button = it.Button(text="BACK TO GAME", x=x_centered, y=y_centered+60, width=200, height=25)
 
-        # Lê os dados dos high scores a partir do arquivo ".save/scores.txt"
-        scores_filepath = os.path.join(st.save_folder, "scores.txt")
-        try:
-            with open(scores_filepath, "r") as file:
-                if file.read() != "":
-                    scores_data = json.load(file)
-                else:
-                    scores_data = {}
-        except FileNotFoundError:
-            scores_data = {"scores": []} # TODO: Conferir qual seria a fórmula de um arquivo vazio
-        sorted_scores = sorted(scores_data.items(), key=lambda x: x[1]["points"], reverse=True)
+        # # Lê os dados dos high scores a partir do arquivo ".save/scores.txt"
+        # scores_filepath = os.path.join(st.save_folder, "scores.txt")
+        # try:
+        #     with open(scores_filepath, "r") as file:
+        #         if file.read() != "":
+        #             scores_data = json.load(file)
+        #         else:
+        #             scores_data = {}
+        # except FileNotFoundError:
+        #     scores_data = {"scores": []} # TODO: Conferir qual seria a fórmula de um arquivo vazio
+        # sorted_scores = sorted(scores_data.items(), key=lambda x: x[1]["points"], reverse=True)
 
         # Inicia um loop para o menu
         while self.in_menu:
@@ -138,7 +138,7 @@ class Game():
             pygame.display.flip()
 
     # Crie um método para o encerramento do jogo
-    def quit_game():
+    def quit_game(self):
         """Encerra o jogo e o executável.
         
 
