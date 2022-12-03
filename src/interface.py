@@ -35,16 +35,16 @@ class Button():
         
         # Caso o botão tenha texto, desenha o texto
         if self.text != "":
-            text_surface = font.render(self.text, 1, self.text_color)
+            text_surface = st.font.render(self.text, 1, self.text_color)
             screen.blit(text_surface, (self.x + (self.width/2 - text_surface.get_width()/2), self.y + (self.height/2 - text_surface.get_height()/2)))
 
         # Recolhe a posição do mouse
         pos = pygame.mouse.get_pos()
         # Altera a cor de fundo do botão, caso o mouse esteja sobre ele
         if self.is_over(pos):
-            self.background_color = WHITE
+            self.background_color = st.WHITE
         else:
-            self.background_color = GREY
+            self.background_color = st.GREY
 
     # Método para verificar se o mouse está sobre o botão
     def is_over(self, pos):
@@ -53,13 +53,12 @@ class Button():
                 return True
                 
         return False
-
-
+        
 class InputTextBox():
 
     # Defina as cores padrão das bordas para os estados de atividade do componente
-    COLOR_INACTIVE = GREY
-    COLOR_ACTIVE = BLACK
+    COLOR_INACTIVE = st.GREY
+    COLOR_ACTIVE = st.BLACK
 
     # Construtor da classe InputTextBox
     def __init__(self, x, y, width=200, height=32, text="", background_color=(255, 255, 255), text_color=(0, 0, 0), centered=True, max_input_length=30):
@@ -80,7 +79,7 @@ class InputTextBox():
 
         # Defina propriedades secundárias do componente
         self.outline_color = InputTextBox.COLOR_INACTIVE
-        self.text_surface = font.render(text, True, text_color)
+        self.text_surface = st.font.render(text, True, text_color)
         self.active = False
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
@@ -115,7 +114,7 @@ class InputTextBox():
                         self.text += event.unicode
 
                 # Atualize a superfície de texto
-                self.text_surface = font.render(self.text, True, self.outline_color)
+                self.text_surface = st.font.render(self.text, True, self.outline_color)
 
     # Método para atualizar o tamanho da caixa de texto caso o texto seja maior que o tamanho da caixa   
     def update(self):
