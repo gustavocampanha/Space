@@ -3,6 +3,7 @@ import pygame
 import random
 import time
 import os
+import setup as st
 
 #Hitbox
 #Bullet
