@@ -126,14 +126,6 @@ class Game():
                     else:
                         pass
                         
-                # # Caso o usuário aperte alguma tecla do teclado
-                # if event.type==pygame.KEYDOWN:
-                #     # Caso o usuário aperte a tecla ESC
-                #     if event.key==pygame.K_ESCAPE:
-                #         # changescn("mainLoop") # TODO: precisa disso aqui????
-                #         self.in_menu = False
-                #         print("mainLoop")
-                        
             # Atualiza os conteúdos da tela
             pygame.display.flip()
 
