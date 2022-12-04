@@ -31,3 +31,31 @@ MAGENTA = (194,9,84)
 
 #Define a fonte utilizada no jogo
 font = pygame.font.SysFont("arcade", 20)
+
+# Crie um grupo para todos os sprites
+all_sprites = pygame.sprite.Group()
+
+# Crie um grupo para os asteroides
+asteroids = pygame.sprite.Group()
+
+# Crie um grupo para as naves inimigas
+enemy_ships = pygame.sprite.Group()
+
+# Crie um grupo para as balas
+bullets = pygame.sprite.Group()
+
+# Crie um grupo para as balas dos inimigos
+enemies_bullets = pygame.sprite.Group()
+
+# Crie um grupo para os bônus
+powers = pygame.sprite.Group()
+
+# Crie um background
+background = pygame.image.load(os.path.join(img_folder, "space.jpg"))
+
+# Armazene a altura desse background
+background_height = background.get_height()
+
+# Som de background
+pygame.mixer.music.load(os.path.join(sound_folder, "som1.mp3"))
+pygame.mixer.music.set_volume(0.5)

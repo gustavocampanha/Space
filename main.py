@@ -8,4 +8,4 @@ sys.path.insert(0, "./src")
 from space_oddity import Game
 
 # Inicializa o jogo
-Game()
+Game() 

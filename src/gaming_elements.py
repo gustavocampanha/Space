@@ -7,6 +7,8 @@ import setup as st
 from abc import ABC, abstractmethod
 from threading import Timer 
 
+# import space_oddity as so
+
 #Hitbox
 #Bullet
 #Player
@@ -58,6 +60,8 @@ class Hitbox(pygame.sprite.Sprite):
         #Position hit box in the center of the player sprite.
         self.position(self.__entity)
 
+   
+#Cria a classe para as balas
 class Bullet(pygame.sprite.Sprite):
     
     #Características iniciais da classe quando ela é iniciada
@@ -93,6 +97,7 @@ class Bullet(pygame.sprite.Sprite):
         self.x_speed = 0
         self.y_speed = 0
         
+    
     #Retorna a posição da bala   
     #@property
     def get_position(self):
@@ -109,6 +114,7 @@ class Bullet(pygame.sprite.Sprite):
         self.x_speed = new_speed_x
         self.y_speed = new_speed_y
     
+    
     #Muda a posição da bala
     def update(self):
         self.rect.x += self.x_speed 
@@ -121,6 +127,7 @@ class Bullet(pygame.sprite.Sprite):
             self.kill()
 
 
+#Cria a classe para o jogador
 class Player(pygame.sprite.Sprite):
     #Características iniciais da classe quando ela é iniciada
     def __init__(self):
@@ -268,6 +275,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.top = 0
         if self.rect.bottom > st.HEIGHT:
             self.rect.bottom = st.HEIGHT
+
     
     #Define a função de atirar
     def shoot(self):
@@ -303,10 +311,11 @@ class Player(pygame.sprite.Sprite):
                 st.all_sprites.add(bullet2)
                 st.bullets.add(bullet2)
         
+    
     def gain_powerup(self):
         self.power += 1
         self.power_time = pygame.time.get_ticks()
-
+            
 
 class Enemy(pygame.sprite.Sprite, ABC):
     def __init__(self):
@@ -340,6 +349,8 @@ class Enemy(pygame.sprite.Sprite, ABC):
     def update(self):
         pass
 
+        
+#Cria a classe para os asteroides 
 class Asteroid(Enemy, pygame.sprite.Sprite):
     #Características iniciais da classe quando ela é iniciada
     def __init__(self):
@@ -385,6 +396,7 @@ class Asteroid(Enemy, pygame.sprite.Sprite):
         #Cria a reta e o círculo para posicionar a classe
         self.rect = self.image.get_rect()
         self.radius = int(self.rect.width * 0.90 / 2)
+        
         
         #Orienta a posição inicial do asteroide
         self.rect.x = random.randrange(st.WIDTH - self.rect.width)
@@ -446,8 +458,9 @@ class Asteroid(Enemy, pygame.sprite.Sprite):
             self.rect.x = random.randrange(st.WIDTH - self.rect.width)
             self.rect.y = random.randrange(-100,-40)
             self.y_speed = random.randrange(1,10)
-
-
+   
+    
+#Crie uma classe para explosões
 class Explosion(pygame.sprite.Sprite):
     
     
@@ -517,7 +530,7 @@ class Explosion(pygame.sprite.Sprite):
     def update(self):
     
         now = pygame.time.get_ticks()
-
+        
         #Caso o tempo decorrido entre o último frame e agora seja maior que a velocidade dos frames,
         # atualize o frame exibido
         if now - self.last_update > self.frame_rate:
@@ -536,8 +549,10 @@ class Explosion(pygame.sprite.Sprite):
         explosion_sound = pygame.mixer.Sound(
             os.path.join(st.sound_folder, "Explosion7.wav"))
         explosion_sound.play()
+   
 
 
+#Cria a classe para as naves inimigas             
 class Enemy_ship(Enemy, pygame.sprite.Sprite):    
     #Características iniciais da classe quando ela é iniciada
     def __init__(self):
@@ -646,7 +661,7 @@ class Enemy_ship(Enemy, pygame.sprite.Sprite):
         self.y_speed = -1
         self.rect.y += self.y_speed
 
-
+#Crie a classe para os bônus (poderes)
 class Power(pygame.sprite.Sprite):
     #Características iniciais da classe quando ela é iniciada
     def __init__(self):

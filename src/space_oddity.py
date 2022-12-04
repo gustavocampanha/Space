@@ -25,6 +25,34 @@ clock = pygame.time.Clock()
 
 # Define a classe principal do jogo, responsável pelas telas e ações da aplicação
 class Game():
+
+    # Crie um st.background
+    st.background = pygame.image.load(os.path.join(st.img_folder, "space.jpg"))
+
+    # Armazene a altura desse st.background
+    st.background_height = st.background.get_height()
+
+    # Som de st.background
+    pygame.mixer.music.load(os.path.join(st.sound_folder, "som1.mp3"))
+    pygame.mixer.music.set_volume(0.5)
+
+    # Crie um grupo para todos os sprites
+    st.all_sprites = pygame.sprite.Group()
+
+    # Crie um grupo para os asteroides
+    st.asteroids = pygame.sprite.Group()
+
+    # Crie um grupo para as naves inimigas
+    st.enemy_ships = pygame.sprite.Group()
+
+    # Crie um grupo para as balas
+    st.bullets = pygame.sprite.Group()
+
+    # Crie um grupo para as balas dos inimigos
+    st.enemies_bullets = pygame.sprite.Group()
+
+    # Crie um grupo para os bônus
+    st.powers = pygame.sprite.Group()
     
     # Define o método construtor da classe
     def __init__(self):
@@ -133,48 +161,21 @@ class Game():
             pygame.display.flip()
 
     def run_game(self):
-        # Crie um grupo para todos os sprites
-        all_sprites = pygame.sprite.Group()
-
-        # Crie um grupo para os asteroides
-        asteroids = pygame.sprite.Group()
-
-        # Crie um grupo para as naves inimigas
-        enemy_ships = pygame.sprite.Group()
-
-        # Crie um grupo para as balas
-        bullets = pygame.sprite.Group()
-
-        # Crie um grupo para as balas dos inimigos
-        enemies_bullets = pygame.sprite.Group()
-
-        # Crie um grupo para os bônus
-        powers = pygame.sprite.Group()
-
-        # Som de background
-        pygame.mixer.music.load(os.path.join(st.sound_folder, "som1.mp3"))
-        pygame.mixer.music.set_volume(0.5)
-
-        # Crie um background
-        background = pygame.image.load(os.path.join(st.img_folder, "space.jpg"))
-
-        # Armazene a altura desse background
-        background_height = background.get_height()
         
         #Crie uma variável para o deslizamento da tela
         scrolling = 0
         
         #Crie uma variável para a quantidade de painés necessários no deslizamento da tela
-        panels = math.ceil(st.HEIGHT/background_height)+2
+        panels = math.ceil(st.HEIGHT/st.background_height)+2
         
         # Atribui a classe player a uma variável
         player = ge.Player()
         player.hitbox = ge.Hitbox(player)
         
         # Adiciona player aos grupo de sprites
-        all_sprites.add(player, player.hitbox)
+        st.all_sprites.add(player, player.hitbox)
         
-        # testButton = cso.Button(color=cso.WHITE, x=200, y=200, width=200, height=200, size=20, text="ABCASKLDASKLDNASD")
+        # testButton = ge.Button(color=ge.WHITE, x=200, y=200, width=200, height=200, size=20, text="ABCASKLDASKLDNASD")
         
         #Cria uma marcação de tempo inicial para spawning
         start_asteroids = pygame.time.get_ticks()
@@ -200,9 +201,10 @@ class Game():
             level_delay = pygame.time.get_ticks()
             
             #Adicione um nível de 5 em 5 segundos
-            if level_delay - start_level_time > 5000:
+            if level_delay - start_level_time   > 5000:
                 start_level_time = pygame.time.get_ticks()
                 level += 1
+            
             
             # Faça o jogo reagir a eventos externos
             for event in pygame.event.get():
@@ -217,27 +219,29 @@ class Game():
                         self.pause = self.paused()
 
             # Atualiza os sprites
-            all_sprites.update()
+            st.all_sprites.update()
+            
             
             # Gera bônus aleatoriamente na tela
             if random.random() < 0.005:
                 power = ge.Power()
-                powers.add(power)
-                all_sprites.add(power)
+                st.powers.add(power)
+                st.all_sprites.add(power)
+
                 
             #Spawna asteroides em intervalos de 3 ou menos segundos (dependendo do nível)
             now = pygame.time.get_ticks()
             if now - start_asteroids > (3000 - 10*level) :
                 start_asteroids = now
-                self.spawn_asteroids(asteroids, all_sprites)
+                self.spawn_asteroids(st.asteroids,st.all_sprites)
         
             #spawna naves inimigas em intervalos de 4 ou menos segundos
             if now - start_enemies_ships > (4000 - 5*level):
                 start_enemies_ships = now
-                self.spawn_enemy_ships(enemy_ships, all_sprites)
+                self.spawn_enemy_ships(st.enemy_ships,st.all_sprites)
 
             #Cria casos de colisão entre balas do jogador e asteroides
-            bullet_hits_asteroid = pygame.sprite.groupcollide(asteroids, bullets, True, True)
+            bullet_hits_asteroid = pygame.sprite.groupcollide(st.asteroids, st.bullets, True, True)
             for hitted_asteroid in bullet_hits_asteroid:
                 asteroid_score = hitted_asteroid.get_score()
                 player_old_score = player.get_score()
@@ -246,15 +250,15 @@ class Game():
                 #Exibe explosão
                 explosion = ge.Explosion(hitted_asteroid.rect.center,"large")
                 explosion.explosion_sound()
-                all_sprites.add(explosion) 
+                st.all_sprites.add(explosion) 
                 
                 # Adiciona um novo asteroide à tela
                 new_asteroid = ge.Asteroid()
-                all_sprites.add(new_asteroid)
-                asteroids.add(new_asteroid)
+                st.all_sprites.add(new_asteroid)
+                st.asteroids.add(new_asteroid)
                 
             #Cria casos de colisão entre balas do jogador e naves inimigas    
-            bullet_hits_enemy_ship = pygame.sprite.groupcollide(enemy_ships, bullets, True, True)
+            bullet_hits_enemy_ship = pygame.sprite.groupcollide(st.enemy_ships,st.bullets, True, True)
             for hitted_enemy_ship in bullet_hits_enemy_ship:
                 enemy_score = hitted_enemy_ship.get_score()
                 player_old_score = player.get_score()
@@ -263,59 +267,59 @@ class Game():
                 #Exibe explosão
                 explosion = ge.Explosion(hitted_enemy_ship.rect.center,"small")
                 explosion.explosion_sound()
-                all_sprites.add(explosion) 
+                st.all_sprites.add(explosion) 
                 
             #Cria casos de colisão entre jogador e asteroides    
             asteroid_hits_player = pygame.sprite.spritecollide(
-                player.hitbox, asteroids, True, pygame.sprite.collide_circle)
+                player.hitbox, st.asteroids, True, pygame.sprite.collide_circle)
             if asteroid_hits_player:
                 #Exibe explosão
                 explosion = ge.Explosion(player.rect.center,"large")
                 explosion.explosion_sound()
-                all_sprites.add(explosion) 
+                st.all_sprites.add(explosion) 
                 
                 #Diminui a vida do jogador
                 life = player.get_life()
                 damage = 1
                 player.set_life(life - damage)
                 if player.get_life() <= 0:
-                    running =  self.game_over(player.get_score()) 
+                    running =  self.player_dies(running) 
                 
             #Cria casos de colisão entre balas do inimigo e o jogador    
             enemy_shoots_player = pygame.sprite.spritecollide(
-                player.hitbox, enemies_bullets, True, pygame.sprite.collide_circle)
+                player.hitbox, st.enemies_bullets, True, pygame.sprite.collide_circle)
             if enemy_shoots_player:
                 #Exibe explosão
                 explosion = ge.Explosion(player.rect.center,"large")
                 explosion.explosion_sound()
-                all_sprites.add(explosion) 
+                st.all_sprites.add(explosion) 
                 
                 #Diminui a vida do jogador
                 life = player.get_life()
                 damage = 1
                 player.set_life(life - damage)
                 if player.get_life() <= 0:
-                    running = self.game_over(player.get_score())  
+                    running = self.player_dies(running)  
                 
             #Cria casos de colisão entre nave inimiga e o jogador    
             enemy_hits_player = pygame.sprite.spritecollide(
-                player.hitbox, enemy_ships, False, pygame.sprite.collide_circle)
+                player.hitbox, st.enemy_ships, False, pygame.sprite.collide_circle)
             if enemy_hits_player:
                 #Exibe explosão
                 explosion = ge.Explosion(player.rect.center,"large")
                 explosion.explosion_sound()
-                all_sprites.add(explosion) 
+                st.all_sprites.add(explosion) 
                 
                 #Diminui a vida do jogador
                 life = player.get_life()
                 damage = 1
                 player.set_life(life - damage)
                 if player.get_life() <= 0:
-                    running =  self.game_over(player.get_score()) 
+                    running =  self.player_dies(running) 
                 
             
             #Cria casos de colisão entre bônus e o jogador
-            player_hits_bonus = pygame.sprite.spritecollide(player.hitbox, powers, True, pygame.sprite.collide_circle)
+            player_hits_bonus = pygame.sprite.spritecollide(player.hitbox, st.powers, True, pygame.sprite.collide_circle)
             
             for hitted_bonus in player_hits_bonus:
                 #Caso seja um escudo, adicione vidas ao a jogador
@@ -334,20 +338,22 @@ class Game():
             elif not keys_pressed[pygame.K_LSHIFT]:
                 player.hitbox.set_visible(False)
 
+
             # Defina a imagem de fundo da tela
             screen.fill((0, 0, 0))
 
-            #Mova o background
+            #Mova o st.background
             for i in range(panels):
-                screen.blit(background,(0,i*background_height+scrolling-background_height))
+                screen.blit(st.background,(0,i*st.background_height+scrolling-st.background_height))
             
             scrolling += 5
             
-            if abs(scrolling)>background_height:
+            if abs(scrolling)>st.background_height:
                 scrolling = 0
+            
 
             # Desenha os sprites na tela
-            all_sprites.draw(screen)
+            st.all_sprites.draw(screen)
 
             # Insere o score na tela
 
@@ -364,6 +370,7 @@ class Game():
             pygame.display.update()
         
         self.quit_game()
+
 
     def paused(self):
         self.pause = True
@@ -425,7 +432,7 @@ class Game():
             clock.tick(st.FPS)
 
     # Crie uma função para a dispersão de asteroides
-    def spawn_asteroids(self, asteroids_group, all_sprites_group):
+    def spawn_asteroids(self, asteroids_group,all_sprites_group):
         """Recebe um grupo para os sprites de asteroides e um para todos os sprites 
         e adiciona asteroides a esses grupos.  
         
@@ -447,7 +454,7 @@ class Game():
         all_sprites_group.add(asteroid)
 
     #Crie uma função para dispersão de naves inimigas    
-    def spawn_enemy_ships(self, enemy_ships_group, all_sprites_group):
+    def spawn_enemy_ships(self, enemy_ships_group,all_sprites_group):
         """Recebe um grupo para os sprites de naves inimigas e um para todos os sprites 
         e adiciona naves inimigas a esses grupos.  
         
